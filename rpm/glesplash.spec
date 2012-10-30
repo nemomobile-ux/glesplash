@@ -18,7 +18,10 @@ BuildRequires: qt-qmake
 %defattr(-,root,root,-)
 %{_bindir}/glesplash
 %{_bindir}/glesplash-fb
-
+%config %{_sysconfdir}/powervr.d/glesplash-fb.ini
+/lib/systemd/system/glesplash-fb.service
+/lib/systemd/system/graphical.target.wants/glesplash-fb.service
+%{_datadir}/%{name}/*.png
 
 %prep
 %setup -q
@@ -31,3 +34,5 @@ make %{?_smp_mflags}
 
 %install
 make INSTALL_ROOT=%{buildroot} install
+mkdir -p %{buildroot}/lib/systemd/system/graphical.target.wants
+ln -sf ../glesplash-fb.service %{buildroot}/lib/systemd/system/graphical.target.wants

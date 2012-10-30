@@ -16,5 +16,11 @@ INCLUDEPATH += ../common
 
 DEFINES += FB
 
+pvrcfg.files = glesplash-fb.ini
+pvrcfg.path = /etc/powervr.d/
+
+service.files = glesplash-fb.service
+service.path = /lib/systemd/system/
+
 target.path = /usr/bin
-INSTALLS += target
+INSTALLS += target pvrcfg service
