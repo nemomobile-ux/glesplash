@@ -38,9 +38,9 @@ void render()
         XGetWindowAttributes(x_display, win, &gwa);
         glViewport(0, 0, gwa.width, gwa.height);
 #else
-        glViewport(0, 0, 854, 480);
+        glViewport(0, 288, 854, 480);
 #endif
-        glClearColor(0.0, 0.0, 0.0, 1.0);
+        glClearColor(1.0, 0.0, 1.0, 1.0);
         init = 1;
     }
 
@@ -93,9 +93,9 @@ int create_egl_context()
         return EXIT_FAILURE;
     }
 
-    if(num_config != 1)
+    if(num_config < 1)
     {
-        cerr << "Multiple configurations returned, got " << num_config << " configurations" << endl;
+        cerr << "No EGL configurations found" << endl;
         return EXIT_FAILURE;
     }
 
