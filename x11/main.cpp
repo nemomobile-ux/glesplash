@@ -95,13 +95,13 @@ int main(int argc, char **argv)
     }
 
     cerr << "Creating X11 window" << endl;
-    if(!create_x11_window(0, 0, 854, 480, "X11 EGL Splash"))
+    if(create_x11_window(0, 0, 854, 480, "X11 EGL Splash") == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
 
     cerr << "Creating EGL context" << endl;
-    if(!create_egl_context())
+    if(create_egl_context() == EXIT_FAILURE)
     {
         XDestroyWindow(x_display, win);
         XCloseDisplay(x_display);
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
     }
 
     cerr << "Initializing EGL context" << endl;
-    if(!init_gl_context())
+    if(init_gl_context() == EXIT_FAILURE)
     {
         eglDestroyContext(egl_display, egl_context);
         eglDestroySurface(egl_display, egl_surface);
