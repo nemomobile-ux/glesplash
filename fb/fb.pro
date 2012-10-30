@@ -1,12 +1,11 @@
-TARGET   = glesplash
+TARGET   = glesplash-fb
 TEMPLATE = app
 CONFIG  += link_pkgconfig
 CONFIG  -= qt
 
-PKGCONFIG += libpng egl glesv2 x11
+PKGCONFIG += libpng egl glesv2
 
-SOURCES = x11.cpp \
-          ../common/main.cpp \
+SOURCES = ../common/main.cpp \
           ../common/png.cpp \
           ../common/shaders.cpp \
           ../common/gl.cpp
@@ -15,7 +14,7 @@ HEADERS = ../common/glesplash.h \
           ../common/shaders.h
 INCLUDEPATH += ../common
 
-DEFINES += X11
+DEFINES += FB
 
 target.path = /usr/bin
 INSTALLS += target

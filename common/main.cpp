@@ -1,14 +1,16 @@
 #include <cmath>
 #include <cstdio>
 #include <cstring>
-#include <string>
 #include <signal.h>
 #include <sys/time.h>
 
-#include "glesplash.h"
+#ifdef FB
+#include <linux/omapfb.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#endif
 
-Display    *x_display;
-Window      win;
+#include "glesplash.h"
 
 GLfloat
    norm_x    =  0.0,
@@ -18,63 +20,11 @@ GLfloat
    p1_pos_x  =  0.0,
    p1_pos_y  =  0.0;
 
-
 bool        update_pos = false;
 
-int create_x11_window(int x, int y, int width, int height, const char* title)
-{
-    x_display = XOpenDisplay(NULL);
-
-    if(!x_display)
-    {
-        cerr << "cannot connect to X server" << endl;
-        return EXIT_FAILURE;
-    }
-
-    Window root = DefaultRootWindow(x_display);
-
-    XSetWindowAttributes wa;
-    wa.event_mask = ExposureMask; // | PointerMotionMask | KeyPressMask;
-
-    win = XCreateWindow(x_display, root, x, y, width, height, 0,
-                        CopyFromParent, InputOutput,
-                        CopyFromParent, CWEventMask,
-                        &wa);
-
-    wa.event_mask = 0;
-    wa.override_redirect = false;
-    XChangeWindowAttributes(x_display, win, CWOverrideRedirect, &wa);
-
-    Atom atom;
-    atom = XInternAtom(x_display, "_NET_WM_STATE_FULLSCREEN", True);
-    XChangeProperty(x_display, win,
-                    XInternAtom(x_display, "_NET_WM_STATE", True),
-                    XA_ATOM, 32, PropModeReplace, (unsigned char*) &atom, 1);
-
-    XWMHints hints;
-    hints.input = True;
-    hints.flags = InputHint;
-    XSetWMHints(x_display, win, &hints);
-
-    XMapWindow(x_display, win);
-    XStoreName(x_display, win, title);
-
-    Atom wm_state = XInternAtom(x_display, "_NET_WM_STATE", False);
-    Atom fs_state = XInternAtom(x_display, "_NET_WM_STATE_FULLSCREEN", False);
-
-    XEvent xev;
-    memset(&xev, 0, sizeof(xev));
-
-    xev.type = ClientMessage;
-    xev.xclient.window = win;
-    xev.xclient.message_type = wm_state;
-    xev.xclient.format = 32;
-    xev.xclient.data.l[0] = 1;
-    xev.xclient.data.l[1] = fs_state;
-    XSendEvent(x_display, root, False, SubstructureNotifyMask, &xev);
-
-    return EXIT_SUCCESS;
-}
+#ifdef X11
+int create_x11_window(int x, int y, int width, int height, const char* title);
+#endif
 
 void signal_callback_handler(int sig)
 {
@@ -82,8 +32,10 @@ void signal_callback_handler(int sig)
     eglDestroyContext(egl_display, egl_context);
     eglDestroySurface(egl_display, egl_surface);
     eglTerminate(egl_display);
+#ifdef X11
     XDestroyWindow(x_display, win);
     XCloseDisplay(x_display);
+#endif
     exit(sig);
 }
 
@@ -94,17 +46,21 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
+#ifdef X11
     cerr << "Creating X11 window" << endl;
     if(create_x11_window(0, 0, 854, 480, "X11 EGL Splash") == EXIT_FAILURE)
     {
         return EXIT_FAILURE;
     }
+#endif
 
     cerr << "Creating EGL context" << endl;
     if(create_egl_context() == EXIT_FAILURE)
     {
+#ifdef X11
         XDestroyWindow(x_display, win);
         XCloseDisplay(x_display);
+#endif
         return EXIT_FAILURE;
     }
 
@@ -114,8 +70,10 @@ int main(int argc, char **argv)
         eglDestroyContext(egl_display, egl_context);
         eglDestroySurface(egl_display, egl_surface);
         eglTerminate(egl_display);
+#ifdef X11
         XDestroyWindow(x_display, win);
         XCloseDisplay(x_display);
+#endif
         return EXIT_FAILURE;
     }
 
@@ -139,9 +97,29 @@ int main(int argc, char **argv)
     signal(SIGHUP, signal_callback_handler);
 
     // Main Loop
+
+#ifdef FB
+    int fd = open("/dev/fb0", O_RDWR);
+    struct omapfb_update_window update;
+#endif
     while (true) {    // the main loop
         render();
 
+#ifdef FB
+        update.x = 0;
+        update.y = 0;
+        update.width = 854;
+        update.height = 480;
+        update.format = OMAPFB_COLOR_RGB565;
+        update.out_x = 0;
+        update.out_y = 0;
+        update.out_width = 854;
+        update.out_height = 480;
+        if (ioctl(fd, OMAPFB_UPDATE_WINDOW, &update) < 0) {
+            perror("Could not ioctl(OMAPFB_UPDATE_WINDOW)");
+        }
+        break;
+#endif
         if(++frames % 60 == 0) {
             gettimeofday(&iterT, &tz);
             float dt = iterT.tv_sec - startT.tv_sec + (iterT.tv_usec - startT.tv_usec) * 1e-6;
@@ -155,7 +133,9 @@ int main(int argc, char **argv)
     eglDestroyContext(egl_display, egl_context);
     eglDestroySurface(egl_display, egl_surface);
     eglTerminate(egl_display);
+#ifdef X11
     XDestroyWindow(x_display, win);
     XCloseDisplay(x_display);
+#endif
     return EXIT_SUCCESS;
 }

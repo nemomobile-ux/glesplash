@@ -33,9 +33,13 @@ void render()
     static int init = 0;
 
     if(!init) {
+#ifdef X11
         XWindowAttributes gwa;
         XGetWindowAttributes(x_display, win, &gwa);
         glViewport(0, 0, gwa.width, gwa.height);
+#else
+        glViewport(0, 0, 854, 480);
+#endif
         glClearColor(0.0, 0.0, 0.0, 1.0);
         init = 1;
     }
@@ -66,7 +70,11 @@ int create_egl_context()
         EGL_NONE
     };
 
+#ifdef X11
     egl_display = eglGetDisplay((EGLNativeDisplayType)x_display);
+#else
+    egl_display = eglGetDisplay(NULL);
+#endif
     if(egl_display == EGL_NO_DISPLAY)
     {
         cerr << "Could not get EGL display" << endl;
@@ -91,7 +99,11 @@ int create_egl_context()
         return EXIT_FAILURE;
     }
 
+#ifdef X11
     egl_surface = eglCreateWindowSurface(egl_display, egl_config, (EGLNativeWindowType)win, NULL);
+#else
+    egl_surface = eglCreateWindowSurface(egl_display, egl_config, (EGLNativeWindowType)NULL, NULL);
+#endif
     if(egl_surface == EGL_NO_SURFACE)
     {
         cerr << "Unable to create EGL surface: " << eglGetError() << endl;

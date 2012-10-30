@@ -17,6 +17,7 @@ BuildRequires: qt-qmake
 %files
 %defattr(-,root,root,-)
 %{_bindir}/glesplash
+%{_bindir}/glesplash-fb
 
 
 %prep
