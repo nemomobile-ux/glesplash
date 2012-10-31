@@ -1,7 +1,6 @@
 [Unit]
 Description=Draw splash screen into frame buffer
 After=ti-omap3-sgx.service
-Before=user-session@1000.service
 
 [Service]
 Type=oneshot
@@ -10,4 +9,4 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/glesplash-fb /usr/share/glesplash/startup.png
 
 [Install]
-WantedBy=graphical.target
+WantedBy=basic.target
