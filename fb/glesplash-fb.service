@@ -1,6 +1,7 @@
 [Unit]
 Description=Draw splash screen into frame buffer
 After=ti-omap3-sgx.service
+Before=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
