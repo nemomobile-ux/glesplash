@@ -35,4 +35,8 @@ make %{?_smp_mflags}
 %install
 make INSTALL_ROOT=%{buildroot} install
 mkdir -p %{buildroot}/lib/systemd/system/basic.target.wants
+mkdir -p %{buildroot}/lib/systemd/system/multi-user.target.wants
 ln -sf ../glesplash-fb.service %{buildroot}/lib/systemd/system/basic.target.wants
+# basic.target is to get splash screen as early as possible
+# multi-user.target is to get splash started when we change from actdead to user mode
+ln -sf ../glesplash-fb.service %{buildroot}/lib/systemd/system/multi-user.target.wants

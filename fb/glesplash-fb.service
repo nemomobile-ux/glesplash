@@ -5,7 +5,7 @@ Before=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
-RemainAfterExit=yes
+RemainAfterExit=no
 # fixme, move that into theme, and make larger
 ExecStart=/usr/bin/glesplash-fb /usr/share/glesplash/startup.png
 
