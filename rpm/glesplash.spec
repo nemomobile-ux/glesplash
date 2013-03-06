@@ -21,6 +21,7 @@ BuildRequires: qt-qmake
 %config %{_sysconfdir}/powervr.d/glesplash-fb.ini
 /lib/systemd/system/glesplash-fb.service
 /lib/systemd/system/basic.target.wants/glesplash-fb.service
+/lib/systemd/system/multi-user.target.wants/glesplash-fb.service
 %{_datadir}/%{name}/*.png
 
 %prep
