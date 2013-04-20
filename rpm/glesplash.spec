@@ -29,7 +29,7 @@ BuildRequires: qt-qmake
 
 
 %build
-qmake
+qmake -qt=4
 make %{?_smp_mflags}
 
 
