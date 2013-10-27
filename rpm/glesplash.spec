@@ -9,7 +9,7 @@ BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(glesv2)
 BuildRequires: pkgconfig(x11)
-BuildRequires: qt-qmake
+BuildRequires: qt5-qmake
 
 %description
 %{summary}.
@@ -29,7 +29,7 @@ BuildRequires: qt-qmake
 
 
 %build
-qmake -qt=4
+qmake -qt=5
 make %{?_smp_mflags}
 
 
