@@ -1,3 +1,6 @@
+# Conditional building of X11 related things                                                                                                                   
+%bcond_with X11
+
 Name: glesplash
 Version: 0.1
 Release: 1
@@ -8,8 +11,10 @@ Source0: %{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(glesv2)
-BuildRequires: pkgconfig(x11)
 BuildRequires: qt5-qmake
+%if %{with X11}
+BuildRequires: pkgconfig(x11)
+%endif
 
 %description
 %{summary}.
@@ -29,8 +34,11 @@ BuildRequires: qt5-qmake
 
 
 %build
-qmake -qt=5
-make %{?_smp_mflags}
+%qmake5
+make %{?_smp_mflags} fb
+%if %{with X11}
+make %{?_smp_mflags} x11
+%endif
 
 
 %install
