@@ -8,7 +8,6 @@ Source0: %{name}-%{version}.tar.gz
 BuildRequires: pkgconfig(libpng)
 BuildRequires: pkgconfig(egl)
 BuildRequires: pkgconfig(glesv2)
-BuildRequires: pkgconfig(x11)
 BuildRequires: qt5-qmake
 
 %description
@@ -16,7 +15,6 @@ BuildRequires: qt5-qmake
 
 %files
 %defattr(-,root,root,-)
-%{_bindir}/glesplash
 %{_bindir}/glesplash-fb
 %config %{_sysconfdir}/powervr.d/glesplash-fb.ini
 /lib/systemd/system/glesplash-fb.service

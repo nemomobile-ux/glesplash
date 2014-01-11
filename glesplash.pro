@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-SUBDIRS = x11 fb
+SUBDIRS = fb
 
 splash.files = startup.png
 splash.path = /usr/share/glesplash
