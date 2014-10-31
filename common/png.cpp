@@ -1,3 +1,6 @@
+// This loader is mostly from PNG documentation, and as such
+// should be distributed under PNG license requirements
+
 #include "glesplash.h"
 
 #include <png.h>
