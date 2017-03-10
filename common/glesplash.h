@@ -9,16 +9,6 @@ using namespace std;
 #include <GLES2/gl2.h>
 #include <EGL/egl.h>
 
-#ifdef X11
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xutil.h>
-
-extern Display    *x_display;
-extern Window      win;
-#endif
-
-
 extern EGLDisplay egl_display;
 extern EGLContext egl_context;
 extern EGLSurface egl_surface;
