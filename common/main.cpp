@@ -4,11 +4,9 @@
 #include <signal.h>
 #include <sys/time.h>
 
-#ifdef FB
 #include <linux/omapfb.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#endif
 
 #include "glesplash.h"
 
@@ -22,9 +20,9 @@ GLfloat
 
 bool        update_pos = false;
 
-#ifdef X11
-int create_x11_window(int x, int y, int width, int height, const char* title);
-#endif
+#define WIDTH 854
+#define HEIGHT 480
+
 
 void signal_callback_handler(int sig)
 {
@@ -32,10 +30,7 @@ void signal_callback_handler(int sig)
     eglDestroyContext(egl_display, egl_context);
     eglDestroySurface(egl_display, egl_surface);
     eglTerminate(egl_display);
-#ifdef X11
-    XDestroyWindow(x_display, win);
-    XCloseDisplay(x_display);
-#endif
+
     exit(sig);
 }
 
@@ -46,21 +41,9 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
 
-#ifdef X11
-    cerr << "Creating X11 window" << endl;
-    if(create_x11_window(0, 0, 854, 480, "X11 EGL Splash") == EXIT_FAILURE)
-    {
-        return EXIT_FAILURE;
-    }
-#endif
-
     cerr << "Creating EGL context" << endl;
     if(create_egl_context() == EXIT_FAILURE)
     {
-#ifdef X11
-        XDestroyWindow(x_display, win);
-        XCloseDisplay(x_display);
-#endif
         return EXIT_FAILURE;
     }
 
@@ -70,10 +53,6 @@ int main(int argc, char **argv)
         eglDestroyContext(egl_display, egl_context);
         eglDestroySurface(egl_display, egl_surface);
         eglTerminate(egl_display);
-#ifdef X11
-        XDestroyWindow(x_display, win);
-        XCloseDisplay(x_display);
-#endif
         return EXIT_FAILURE;
     }
 
@@ -98,28 +77,25 @@ int main(int argc, char **argv)
 
     // Main Loop
 
-#ifdef FB
     int fd = open("/dev/fb0", O_RDWR);
     struct omapfb_update_window update;
-#endif
     while (true) {    // the main loop
         render();
 
-#ifdef FB
         update.x = 0;
         update.y = 0;
-        update.width = 854;
-        update.height = 480;
+        update.width = WIDTH;
+        update.height = HEIGHT;
         update.format = OMAPFB_COLOR_RGB565;
         update.out_x = 0;
         update.out_y = 0;
-        update.out_width = 854;
-        update.out_height = 480;
+        update.out_width = WIDTH;
+        update.out_height = HEIGHT;
         if (ioctl(fd, OMAPFB_UPDATE_WINDOW, &update) < 0) {
             perror("Could not ioctl(OMAPFB_UPDATE_WINDOW)");
         }
         break;
-#endif
+
         if(++frames % 60 == 0) {
             gettimeofday(&iterT, &tz);
             float dt = iterT.tv_sec - startT.tv_sec + (iterT.tv_usec - startT.tv_usec) * 1e-6;
@@ -133,9 +109,5 @@ int main(int argc, char **argv)
     eglDestroyContext(egl_display, egl_context);
     eglDestroySurface(egl_display, egl_surface);
     eglTerminate(egl_display);
-#ifdef X11
-    XDestroyWindow(x_display, win);
-    XCloseDisplay(x_display);
-#endif
     return EXIT_SUCCESS;
 }

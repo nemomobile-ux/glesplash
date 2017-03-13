@@ -1,4 +1,6 @@
 *.list
+*.o
+RPMS
 Makefile
 glesplash
 glesplash-fb
